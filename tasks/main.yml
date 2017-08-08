@@ -1,0 +1,34 @@
+---
+- name: Delete users
+  include: delete_users.yml
+  with_items: "{{ deleted_local_users }}"
+
+- name: Delete groups
+  include: delete_groups.yml
+  with_items: "{{ deleted_local_groups }}"
+
+- name: Create groups
+  include: create_groups.yml
+  with_dict: "{{ local_groups }}"
+
+- name: Create users
+  include: create_users.yml
+  loop_control:
+    loop_var: user
+  with_dict: "{{ local_users }}"
+
+- name: Manage home permissions
+  include: manage_home.yml
+  loop_control:
+    loop_var: user
+  with_dict: "{{ local_users }}"
+
+- name: Manage authorized_keys
+  include: manage_pubkeys.yml
+  loop_control:
+    loop_var: user
+  with_dict: "{{ local_users }}"
+
+- name: Manage sudoers
+  include: manage_sudoers.yml
+# vim:ft=ansible:

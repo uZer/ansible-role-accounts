@@ -1,0 +1,21 @@
+---
+- name: Delete unwanted local users.
+  user:
+    # NOTE: Home directory is preserved
+    name: "{{ item }}"
+    state: absent
+  become: yes
+  tags:
+    - delete_users
+    - users
+
+- name: Delete unwanted user's main group
+  group:
+    name: "{{ item }}"
+    state: absent
+  become: yes
+  tags:
+    - delete_users
+    - delete_groups
+    - users
+# vim:ft=ansible:

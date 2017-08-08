@@ -1,0 +1,12 @@
+---
+- name: Give sudo permissions
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: "^%{{ item.name }}"
+    line: "%{{ item.name }} ALL=(ALL) {% if not item.ask_pass | default(no) %}NOPASSWD:{% endif %} {{ item.commands | default(['ALL']) | join(', ') }}"
+    validate: visudo -cf %s
+  with_items: "{{ sudoers }}"
+  tags:
+    - sudoers
+# vim:ft=ansible:

@@ -1,0 +1,20 @@
+---
+- name: Manage authorized keys for a user. Removes unwanted authorized_keys.
+  authorized_key:
+    # NOTE: see http://docs.ansible.com/ansible/latest/authorized_key_module.html
+    # if you plan to change exclusive mode
+    user: "{{ user.key }}"
+    key: "{{ user.value.pubkeys | default([]) | join('\n') }}"
+    exclusive: "{{ user.value.pubkeys_exclusive | default(manage_authorized_keys) }}"
+  become: yes
+  # when: user.value.pubkeys is defined
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - manage_users_authorized_keys
+    - pubkeys
+    - security
+    - ssh
+    - users
+
+# - name: Delete authorized_keys if ssh_pubkeys is not here
+# vim:ft=ansible:

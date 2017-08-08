@@ -1,0 +1,22 @@
+---
+# defaults vars file for current role
+local_users: {}
+local_groups: {}
+delete_local_users: []
+delete_local_groups: []
+
+def_user_comment: "ANSIBLE MANAGED USER"
+def_user_home: "/home/{{ user.key }}"
+def_user_home_mode: '0770'
+def_user_home_user: '{{ user.key }}'
+def_user_home_group: '{{ user.value.group | default(user.key) }}'
+def_user_shell: "/bin/bash"
+def_user_createhome: yes
+def_user_move_home: no
+
+sudoers: []
+
+# Wheter we should remove unlisted authorized keys from file or not
+manage_authorized_keys: yes
+
+# vim:ft=ansible:

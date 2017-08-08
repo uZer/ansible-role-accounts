@@ -1,0 +1,26 @@
+---
+- name: Set user's home owner/group recursively
+  file:
+    path: "{{ user.value.home | default(def_user_home) }}"
+    owner: "{{ user.value.home_user | default (def_user_home_user) }}"
+    group: "{{ user.value.home_group | default (def_user_home_group) }}"
+    recurse: yes
+  become: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - home
+    - permissions
+    - users
+
+- name: Set user's home mode (chmod)
+  file:
+    path: "{{ user.value.home | default(def_user_home) }}"
+    mode: "{{ user.value.home_mode | default(def_user_home_mode) }}"
+    recurse: no
+  become: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - home
+    - permissions
+    - users
+# vim:ft=ansible:

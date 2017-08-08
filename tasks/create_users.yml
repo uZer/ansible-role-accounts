@@ -1,0 +1,84 @@
+---
+
+## BUILD LIST OF USER'S ADDITIONAL GROUPS
+- set_fact:
+    _grouplist: []
+  check_mode: no
+  tags:
+    - create_users
+    - create_groups
+    - users
+
+- set_fact:
+    _grouplist: "{{ _grouplist }} + [ '{{ item.key }}' ]"
+  when: user.key in item.value.users
+  with_dict: "{{ local_groups }}"
+  check_mode: no
+  tags:
+    - create_users
+    - create_groups
+    - users
+
+# Uncomment to enable this behavior. Change group task accordingly
+# ## IF LIST IS EMPTY, DON'T PASS A LIST TO USER MODULE
+# ## (Otherwise deletion of unmanaged additional groups would happen)
+# - set_fact:
+#     usergroups: "{{ _grouplist }}"
+#   when: _grouplist|length > 0
+#   check_mode: no
+#   tags:
+#     - create_users
+#     - create_groups
+#     - users
+
+- name: Create local user's main group
+  group:
+    gid: "{{ user.value.uid | default(omit) }}"
+    name: "{{ user.key }}"
+  when: user.value.group is not defined
+  tags:
+    - create_users
+    - create_groups
+    - users
+
+- name: Create local users
+  user:
+    # NOTE: We don't support password yet
+    name: "{{ user.key }}"
+    comment: "{{ user.value.comment | default(def_user_comment) }}"
+    createhome: "{{ user.value.comment | default(def_user_createhome) }}"
+    group: "{{ user.value.group | default(user.key) }}"
+    # FIXME: Use group.yml instead
+    groups: "{{ _grouplist | default(omit) }}"
+    home: "{{ user.value.home | default(def_user_home) }}"
+    move_home: "{{ user.value.home | default(def_user_move_home) }}"
+    shell: "{{ user.value.shell | default(def_user_shell) }}"
+    system: "{{ user.value.system | default(omit) }}"
+    uid: "{{ user.value.uid | default(omit) }}"
+  become: yes
+  tags:
+    - create_users
+    - users
+
+- name: Check if the user has a password
+  shell: >
+    [[ $(grep {{ user.key }} /etc/shadow | cut -d ':' -f 2) == '*' ]]
+  register: nopassword
+  changed_when: no
+  check_mode: no
+  ignore_errors: yes
+  become: yes
+  when: user.value.password is not defined
+  tags:
+    - create_users
+    - users
+
+- name: Enable users with no password
+  shell: >
+    usermod -p "*" "{{ user.key }}"
+  become: yes
+  when: user.value.password is not defined and nopassword.rc != 0
+  tags:
+    - create_users
+    - users
+# vim:ft=ansible:

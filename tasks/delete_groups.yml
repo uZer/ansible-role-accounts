@@ -1,0 +1,10 @@
+---
+- name: Delete unwanted local groups
+  group:
+    name: "{{ item }}"
+    state: absent
+  become: yes
+  tags:
+    - delete_groups
+    - users
+# vim:ft=ansible:

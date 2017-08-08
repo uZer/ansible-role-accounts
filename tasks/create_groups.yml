@@ -1,0 +1,11 @@
+---
+- name: Create local groups
+  group:
+    name: "{{ item.key }}"
+    gid: "{{ item.value.gid | default(omit) }}"
+    system: "{{ item.value.system | default(omit) }}"
+  become: yes
+  tags:
+    - create_groups
+    - users
+# vim:ft=ansible:
