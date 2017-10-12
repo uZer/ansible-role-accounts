@@ -5,9 +5,9 @@ local_groups: {}
 delete_local_users: []
 delete_local_groups: []
 
-def_user_comment: "ANSIBLE MANAGED USER"
+def_user_comment: "{{ user.value.firstname }} {{ user.value.lastname }}"
 def_user_home: "/home/{{ user.key }}"
-def_user_home_mode: '0770'
+def_user_home_mode: '0700'
 def_user_home_user: '{{ user.key }}'
 def_user_home_group: '{{ user.value.group | default(user.key) }}'
 def_user_shell: "/bin/bash"
